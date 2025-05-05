@@ -54,7 +54,7 @@ router.get(
 router.put(
   "/:id",
   (req, res, next) => {
-    if (req.user.id === req.params.id || req.user.role === 'admin') {
+    if (req.user._id === req.params.id || req.user.role === 'admin') {
       return next();
     }
     return res.status(403).json({ success: false, message: "Not authorized" });

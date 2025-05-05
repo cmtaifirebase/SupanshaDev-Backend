@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Role = require('../models/Role');
 
 // Authentication middleware
 exports.authenticate = async (req, res, next) => {
@@ -30,8 +31,11 @@ exports.authenticate = async (req, res, next) => {
       return res.status(403).json({ success: false, error: 'User account is inactive' });
     }
 
-    req.user = user;
+    // find role by name and append permissions to user
+    const role = await Role.findOne({ name: user.role });
+    user.permissions = role.permissions;
 
+    req.user = user;
     next();
   } catch (error) {
     console.error('Authentication error:', error.message);
@@ -241,7 +245,7 @@ exports.requireModulePermission = (module, action) => {
         return next();
       }
 
-      const user = await User.findById(req.user._id).select('permissions');
+      const user = req.user;
       const modulePermissions = user.permissions[module];
 
       if (!modulePermissions || !modulePermissions[action]) {
@@ -271,7 +275,8 @@ exports.hasModuleAccess = (module) => {
         return next();
       }
 
-      const user = await User.findById(req.user._id).select('permissions');
+      const user = req.user;
+      // get permissions from user object
       const modulePermissions = user.permissions.get(module);
 
       if (!modulePermissions) {

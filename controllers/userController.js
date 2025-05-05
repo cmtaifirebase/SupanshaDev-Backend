@@ -38,6 +38,10 @@ exports.getUserById = async (req, res) => {
     if (!user) {
       return res.status(404).json({ success: false, error: 'User not found' });
     }
+    // find role by name and append permissions to user
+    const role = await Role.findOne({ name: user.role });
+    user.permissions = role.permissions;
+    
     res.json({ success: true, data: user });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

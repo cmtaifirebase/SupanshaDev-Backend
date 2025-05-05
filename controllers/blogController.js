@@ -38,7 +38,7 @@ exports.createBlog = async (req, res) => {
     const newBlog = new Blog({
       ...result.data,
       slug,
-      authorId: req.user.id,
+      authorId: req.user._id,
       estimatedReadTime
     });
 

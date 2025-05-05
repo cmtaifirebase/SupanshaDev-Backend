@@ -68,7 +68,7 @@ const eventSchema = z.object({
 exports.createEvent = async (req, res) => {
     try {
         const eventData = req.body;
-        eventData.createdBy = req.user.id; // Assuming user added by auth middleware
+        eventData.createdBy = req.user._id; // Assuming user added by auth middleware
 
         // Validate using Zod
         const validatedData = eventSchema.parse(eventData);

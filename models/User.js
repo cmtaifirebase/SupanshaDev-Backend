@@ -1,35 +1,36 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const Role = require('./Role'); // Adjust the path if needed
 
 const userSchema = new mongoose.Schema({
-  name: { 
-    type: String, 
-    required: true, 
-    trim: true 
+  name: {
+    type: String,
+    required: true,
+    trim: true
   },
-  email: { 
-    type: String, 
-    required: true, 
+  email: {
+    type: String,
+    required: true,
     unique: true,
     lowercase: true,
     trim: true,
-    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
+    match: [
+      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+      'Please fill a valid email address'
+    ]
   },
-  password: { 
-    type: String, 
-    required: true, 
-    minlength: 6 
+  password: {
+    type: String,
+    required: true,
+    minlength: 6
   },
-
-  // Add a field to choose between Member or Organization
   accountType: {
     type: String,
     required: true,
     enum: ['member', 'organization']
   },
-
-  role: { 
-    type: String, 
+  role: {
+    type: String,
     required: true,
     enum: [
       'admin',
@@ -43,18 +44,11 @@ const userSchema = new mongoose.Schema({
     ],
     default: 'user'
   },
-
   status: {
     type: String,
     enum: ['active', 'inactive'],
     default: 'active'
   },
-
-  permissions: {
-    type: mongoose.Schema.Types.Mixed,
-    default: {}
-  },
-
   designation: {
     type: String,
     enum: [
@@ -69,14 +63,12 @@ const userSchema = new mongoose.Schema({
     ],
     default: null
   },
-
-  level: { 
-    type: Number, 
-    min: 1, 
-    max: 12, 
-    default: 1 
+  level: {
+    type: Number,
+    min: 1,
+    max: 12,
+    default: 1
   },
-
   geo: {
     country: { type: String, default: null },
     state: { type: String, default: null },
@@ -85,9 +77,7 @@ const userSchema = new mongoose.Schema({
     block: { type: String, default: null },
     area: { type: String, default: null }
   },
-
   assignedRegions: [{ type: String, default: [] }],
-
   createdAt: {
     type: Date,
     default: Date.now
@@ -95,76 +85,34 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Hash password before saving
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
   if (this.isModified('password')) {
-    this.password = await bcrypt.hash(this.password, 10);
+    try {
+      this.password = await bcrypt.hash(this.password, 10);
+    } catch (err) {
+      return next(err);
+    }
   }
   next();
 });
 
-// Set default permissions based on role
-userSchema.pre('save', function(next) {
+// Assign default permissions dynamically based on role
+userSchema.pre('save', async function (next) {
   if (this.isNew || this.isModified('role')) {
-    const defaultPermissions = {
-      'admin': {
-        'dashboard': { read: true, create: true, update: true, delete: true },
-        'certificates': { read: true, create: true, update: true, delete: true },
-        'reports': { read: true, create: true, update: true, delete: true },
-        'formats': { read: true, create: true, update: true, delete: true },
-        'events': { read: true, create: true, update: true, delete: true },
-        'jobs': { read: true, create: true, update: true, delete: true },
-        'blogs': { read: true, create: true, update: true, delete: true },
-        'causes': { read: true, create: true, update: true, delete: true },
-        'crowd-funding': { read: true, create: true, update: true, delete: true },
-        'forum': { read: true, create: true, update: true, delete: true },
-        'shop': { read: true, create: true, update: true, delete: true }
-      },
-      'country-admin': {
-        'dashboard': { read: true, create: false, update: false, delete: false },
-        'certificates': { read: true, create: true, update: true, delete: false },
-        'reports': { read: true, create: true, update: true, delete: false },
-        'formats': { read: true, create: false, update: false, delete: false },
-        'events': { read: true, create: true, update: true, delete: false },
-        'jobs': { read: true, create: true, update: true, delete: false },
-        'blogs': { read: true, create: true, update: true, delete: false },
-        'causes': { read: true, create: true, update: true, delete: false },
-        'crowd-funding': { read: true, create: true, update: true, delete: false },
-        'forum': { read: true, create: true, update: true, delete: false },
-        'shop': { read: true, create: false, update: false, delete: false }
-      },
-      'state-admin': {
-        'dashboard': { read: true, create: false, update: false, delete: false },
-        'certificates': { read: true, create: true, update: true, delete: false },
-        'reports': { read: true, create: true, update: true, delete: false },
-        'formats': { read: true, create: false, update: false, delete: false },
-        'events': { read: true, create: true, update: true, delete: false },
-        'jobs': { read: true, create: true, update: true, delete: false },
-        'blogs': { read: true, create: true, update: true, delete: false },
-        'causes': { read: true, create: true, update: true, delete: false },
-        'crowd-funding': { read: true, create: true, update: true, delete: false },
-        'forum': { read: true, create: true, update: true, delete: false },
-        'shop': { read: true, create: false, update: false, delete: false }
-      },
-      'user': {
-        'dashboard': { read: true, create: false, update: false, delete: false },
-        'certificates': { read: true, create: false, update: false, delete: false },
-        'reports': { read: true, create: false, update: false, delete: false },
-        'formats': { read: true, create: false, update: false, delete: false },
-        'events': { read: true, create: false, update: false, delete: false },
-        'jobs': { read: true, create: false, update: false, delete: false },
-        'blogs': { read: true, create: false, update: false, delete: false },
-        'causes': { read: true, create: false, update: false, delete: false },
-        'crowd-funding': { read: true, create: false, update: false, delete: false },
-        'forum': { read: true, create: true, update: true, delete: false },
-        'shop': { read: true, create: false, update: false, delete: false }
+    try {
+      const roleDoc = await Role.findOne({ name: this.role });
+      if (roleDoc) {
+        this.permissions = roleDoc.permissions;
+      } else {
+        this.permissions = {}; // fallback
       }
-    };
-
-    if (defaultPermissions[this.role]) {
-      this.permissions = defaultPermissions[this.role];
+      next();
+    } catch (err) {
+      return next(err);
     }
+  } else {
+    next();
   }
-  next();
 });
 
 module.exports = mongoose.model('User', userSchema);

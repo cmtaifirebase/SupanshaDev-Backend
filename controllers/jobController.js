@@ -23,7 +23,7 @@ exports.createJob = async (req, res) => {
         }
 
         const jobData = result.data;
-        jobData.postedBy = req.user.id;
+        jobData.postedBy = req.user._id;
 
         const newJob = await Job.create(jobData);
         res.status(201).json({ success: true, job: newJob });

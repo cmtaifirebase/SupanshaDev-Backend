@@ -2,6 +2,7 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { z } = require('zod');
+const Role = require('../models/Role');
 
 // Validation schemas
 const registerSchema = z.object({
@@ -141,6 +142,13 @@ exports.registerUser = async (req, res) => {
       expiresIn: '7d'
     })
 
+    // remove password from user
+    const userWithoutPassword = user.toObject();
+    delete userWithoutPassword.password;
+    // find role by name and append permissions to user
+    const role = await Role.findOne({ name: user.role });
+    userWithoutPassword.permissions = role.permissions;
+
     // ✅ Set cookie and respond
     res.cookie('token', token, {
       httpOnly: true,
@@ -149,7 +157,7 @@ exports.registerUser = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     }).status(201).json({
       success: true,
-      user
+      user: userWithoutPassword
     });
 
   } catch (error) {
@@ -175,10 +183,13 @@ exports.loginUser = async (req, res) => {
     }
 
     const { email, password } = result.data;
-
+    console.log(email, password)
     // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
+
+      console.log(user)
+      console.log("user not found")
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
@@ -188,6 +199,7 @@ exports.loginUser = async (req, res) => {
     // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      console.log(isMatch)
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
@@ -203,6 +215,9 @@ exports.loginUser = async (req, res) => {
     // send user without password
     const userWithoutPassword = user.toObject();
     delete userWithoutPassword.password;
+    // find role by name and append permissions to user
+    const role = await Role.findOne({ name: user.role });
+    userWithoutPassword.permissions = role.permissions;
     res.cookie('token', token, cookieOptions)
        .status(200)
        .json({
@@ -234,6 +249,9 @@ exports.getUserDetails = async (req, res) => {
     // send user without password
     const userWithoutPassword = user.toObject();
     delete userWithoutPassword.password;
+    // find role by name and append permissions to user
+    const role = await Role.findOne({ name: user.role });
+    userWithoutPassword.permissions = role.permissions;
     res.status(200).json({
       success: true,
       user: userWithoutPassword
