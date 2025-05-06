@@ -27,7 +27,7 @@ app.use(
         process.env.CLIENT_URL,
         "http://localhost:3000",
         "http://localhost:5000",
-        "https://supanshadevelopment.vercel.app",
+        "https://supanshadevelopment-kaxpaxhir-adarshs-projects-5a0ea829.vercel.app",
       ].filter(Boolean);
 
       if (!origin || allowed.includes(origin)) {
