@@ -12,6 +12,7 @@ const eventSchema = new mongoose.Schema({
     websiteLink: { type: String },
 
     eventTitle: { type: String, required: true },
+    slug: { type: String, required: true, unique: true },
     eventDescription: { type: String },
     eventType: { type: String },
     themeFocusArea: { type: String },

@@ -1,5 +1,6 @@
 const Event = require('../models/Event');
 const { z } = require('zod');
+const slugify = require('slugify');
 
 // Validation Schema
 const signatorySchema = z.object({
@@ -68,12 +69,27 @@ const eventSchema = z.object({
 exports.createEvent = async (req, res) => {
     try {
         const eventData = req.body;
-        eventData.createdBy = req.user._id; // Assuming user added by auth middleware
+        eventData.createdBy = req.user._id;
 
         // Validate using Zod
         const validatedData = eventSchema.parse(eventData);
 
-        const newEvent = await Event.create(validatedData);
+        // Generate slug from title
+        const baseSlug = slugify(validatedData.eventTitle, { lower: true });
+        let slug = baseSlug;
+        let counter = 1;
+
+        // Check for duplicate slugs
+        while (await Event.findOne({ slug })) {
+            slug = `${baseSlug}-${counter}`;
+            counter++;
+        }
+
+        const newEvent = await Event.create({
+            ...validatedData,
+            slug
+        });
+
         res.status(201).json({ success: true, event: newEvent });
     } catch (error) {
         console.error('Error creating event:', error);
@@ -86,7 +102,18 @@ exports.createEvent = async (req, res) => {
     }
 };
 
-// Get all Events (Admin / Public)
+// Get all Events by approval status approved
+exports.getAllApprovedEvents = async (req, res) => {
+    try {
+        const events = await Event.find({ approvalStatus: 'Approved', displayOnWebsite: true });
+        res.status(200).json({ success: true, events });
+    } catch (error) {
+        console.error('Error fetching approved events:', error);
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};
+
+// Get all Events (Admin)
 exports.getAllEvents = async (req, res) => {
     try {
         const events = await Event.find();
@@ -97,11 +124,31 @@ exports.getAllEvents = async (req, res) => {
     }
 };
 
-// Get Single Event
+// Get Single Event by ID
 exports.getEventById = async (req, res) => {
     try {
         const event = await Event.findById(req.params.id);
         if (!event) return res.status(404).json({ success: false, message: 'Event Not Found' });
+
+        res.status(200).json({ success: true, event });
+    } catch (error) {
+        console.error('Error fetching event:', error);
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};
+
+// Get Single Event by Slug
+exports.getEventBySlug = async (req, res) => {
+    try {
+        const event = await Event.findOne({ 
+            slug: req.params.slug,
+            approvalStatus: 'Approved',
+            displayOnWebsite: true
+        });
+        
+        if (!event) {
+            return res.status(404).json({ success: false, message: 'Event Not Found' });
+        }
 
         res.status(200).json({ success: true, event });
     } catch (error) {
@@ -127,32 +174,62 @@ exports.approveEvent = async (req, res) => {
     }
 };
 
-
 // Update Event
 exports.updateEvent = async (req, res) => {
     try {
-      const updatedEvent = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
-      if (!updatedEvent) {
-        return res.status(404).json({ success: false, message: "Event not found" });
-      }
-      res.status(200).json({ success: true, event: updatedEvent });
+        const updates = req.body;
+        
+        // If title is being updated, update slug as well
+        if (updates.eventTitle) {
+            const baseSlug = slugify(updates.eventTitle, { lower: true });
+            let slug = baseSlug;
+            let counter = 1;
+
+            // Check for duplicate slugs, excluding the current event
+            while (await Event.findOne({ slug, _id: { $ne: req.params.id } })) {
+                slug = `${baseSlug}-${counter}`;
+                counter++;
+            }
+
+            updates.slug = slug;
+        }
+
+        // Validate the updates
+        const validatedData = eventSchema.partial().parse(updates);
+
+        const updatedEvent = await Event.findByIdAndUpdate(
+            req.params.id, 
+            { ...validatedData, slug: updates.slug },
+            { new: true }
+        );
+
+        if (!updatedEvent) {
+            return res.status(404).json({ success: false, message: "Event not found" });
+        }
+
+        res.status(200).json({ success: true, event: updatedEvent });
     } catch (error) {
-      console.error('Error updating event:', error);
-      res.status(500).json({ success: false, message: 'Server Error' });
+        console.error('Error updating event:', error);
+        
+        if (error.name === 'ZodError') {
+            return res.status(400).json({ success: false, message: 'Validation Error', errors: error.errors });
+        }
+
+        res.status(500).json({ success: false, message: 'Server Error' });
     }
-  };
-  
-  // Delete Event
-  exports.deleteEvent = async (req, res) => {
+};
+
+// Delete Event
+exports.deleteEvent = async (req, res) => {
     try {
-      const event = await Event.findByIdAndDelete(req.params.id);
-      if (!event) {
-        return res.status(404).json({ success: false, message: "Event not found" });
-      }
-      res.status(200).json({ success: true, message: "Event deleted successfully" });
+        const event = await Event.findByIdAndDelete(req.params.id);
+        if (!event) {
+            return res.status(404).json({ success: false, message: "Event not found" });
+        }
+        res.status(200).json({ success: true, message: "Event deleted successfully" });
     } catch (error) {
-      console.error('Error deleting event:', error);
-      res.status(500).json({ success: false, message: 'Server Error' });
+        console.error('Error deleting event:', error);
+        res.status(500).json({ success: false, message: 'Server Error' });
     }
-  };
+};
   
