@@ -307,3 +307,33 @@ exports.getDonationByCause = async (req, res) => {
     });
   }
 };
+
+// Get User Donations
+exports.getUserDonations = async (req, res) => {
+  try {
+    // Check if user is requesting their own donations
+    if (req.user._id.toString() !== req.params.userId) {
+      return res.status(403).json({ 
+        success: false, 
+        message: "You can only view your own donations" 
+      });
+    }
+
+    const donations = await Donation.find({ 
+      userId: req.params.userId 
+    })
+    .sort({ createdAt: -1 })
+    .populate('causeId', 'name description');
+
+    res.status(200).json({ 
+      success: true, 
+      donations 
+    });
+  } catch (err) {
+    console.error('Error fetching user donations:', err);
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to fetch donations" 
+    });
+  }
+};
