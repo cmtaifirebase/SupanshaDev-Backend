@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   createBlog,
   getAllBlogs,
+  getAllPublishedBlogs,
   getSingleBlog,
   updateBlog,
   deleteBlog
@@ -11,15 +12,19 @@ const {
 const { authenticate, requireModulePermission } = require('../middlewares/authMiddleware');
 
 // Protected routes
-router.use(authenticate);
+// Public routes
+router.get('/', getAllPublishedBlogs);
 
-// Public
-router.get('/', getAllBlogs);
+
+
+
+// Admin routes - must come before /:slug to avoid conflicts
+router.get('/admin', authenticate, requireModulePermission('blogs', 'read'), getAllBlogs);
+router.post('/', authenticate, requireModulePermission('blogs', 'create'), createBlog);
+router.put('/:id', authenticate, requireModulePermission('blogs', 'update'), updateBlog);
+router.delete('/:id', authenticate, requireModulePermission('blogs', 'delete'), deleteBlog);
+
+// Public single blog route - must come after admin routes
 router.get('/:slug', getSingleBlog);
-
-// Admin/Contributor routes
-router.post('/', requireModulePermission('blogs', 'create'), createBlog);
-router.put('/:id', requireModulePermission('blogs', 'update'), updateBlog);
-router.delete('/:id', requireModulePermission('blogs', 'delete'), deleteBlog);
 
 module.exports = router;

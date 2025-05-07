@@ -3,14 +3,14 @@ const bcrypt = require('bcryptjs');
 const Role = require('./Role'); // Adjust the path if needed
 
 const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true
+  name: { 
+    type: String, 
+    required: true, 
+    trim: true 
   },
-  email: {
-    type: String,
-    required: true,
+  email: { 
+    type: String, 
+    required: true, 
     unique: true,
     lowercase: true,
     trim: true,
@@ -19,18 +19,18 @@ const userSchema = new mongoose.Schema({
       'Please fill a valid email address'
     ]
   },
-  password: {
-    type: String,
-    required: true,
-    minlength: 6
+  password: { 
+    type: String, 
+    required: true, 
+    minlength: 6 
   },
   accountType: {
     type: String,
     required: true,
     enum: ['member', 'organization']
   },
-  role: {
-    type: String,
+  role: { 
+    type: String, 
     required: true,
     enum: [
       'admin',
@@ -63,11 +63,11 @@ const userSchema = new mongoose.Schema({
     ],
     default: null
   },
-  level: {
-    type: Number,
-    min: 1,
-    max: 12,
-    default: 1
+  level: { 
+    type: Number, 
+    min: 1, 
+    max: 12, 
+    default: 1 
   },
   geo: {
     country: { type: String, default: null },

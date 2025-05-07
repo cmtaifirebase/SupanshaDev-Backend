@@ -51,6 +51,19 @@ exports.createBlog = async (req, res) => {
   }
 };
 
+// get all published blogs
+exports.getAllPublishedBlogs = async (req, res) => {
+  try {
+    const blogs = await Blog.find({ status: "Published" }).sort({ createdAt: -1 });
+    res.status(200).json({ success: true, blogs });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Failed to fetch blogs" });
+  }
+};
+
+
+
+
 exports.getAllBlogs = async (req, res) => {
   try {
     const blogs = await Blog.find().sort({ createdAt: -1 });
@@ -62,7 +75,8 @@ exports.getAllBlogs = async (req, res) => {
 
 exports.getSingleBlog = async (req, res) => {
   try {
-    const blog = await Blog.findOne({ slug: req.params.slug });
+    // check if the blog is published
+    const blog = await Blog.findOne({ slug: req.params.slug, status: "Published" });
     if (!blog) {
       return res.status(404).json({ success: false, message: "Blog not found" });
     }
