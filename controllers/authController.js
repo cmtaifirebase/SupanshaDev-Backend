@@ -9,7 +9,7 @@ const registerSchema = z.object({
   name: z.string().min(3).max(50),
   email: z.string().email(),
   password: z.string().min(6),
-  accountType: z.enum(['member', 'organization']).default('member'),
+  accountType: z.enum(['individual', 'organization']).default('individual'),
   role: z.enum([
     'user'
   ]).default('user'),
@@ -269,7 +269,7 @@ exports.getUserDetails = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const { accountType } = req.query; // ?accountType=member or organization
+    const { accountType } = req.query; // ?accountType=individual or organization
 
     let query = {};
     if (accountType) {

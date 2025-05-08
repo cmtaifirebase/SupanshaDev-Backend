@@ -10,7 +10,7 @@ const createUserSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
   role: z.string(),
-  accountType: z.enum(['member', 'organization']),
+  accountType: z.enum(['individual', 'organization']),
 });
 
 const updateStatusSchema = z.object({

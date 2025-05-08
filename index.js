@@ -16,6 +16,8 @@ const donationRoutes = require('./routes/donationRoutes');
 const activityRoutes = require('./routes/activityRoutes')
 const userRoutes = require('./routes/userRoutes')
 const roleRoutes = require('./routes/roleRoutes')
+const causeRoutes = require('./routes/causeRoutes')
+
 // Initialize Express app
 const app = express();
 
@@ -64,7 +66,7 @@ app.use('/api/donation', donationRoutes);
 app.use('/api/activities', activityRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/roles', roleRoutes)
-
+app.use('/api/cause', causeRoutes)
 
 // Error handling middleware
 app.use((err, req, res, next) => {

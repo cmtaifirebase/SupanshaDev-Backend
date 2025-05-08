@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema({
   accountType: {
     type: String,
     required: true,
-    enum: ['member', 'organization']
+    enum: ['individual', 'organization']
   },
   role: { 
     type: String, 
