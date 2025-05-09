@@ -7,13 +7,14 @@ const donationSchema = z.object({
   phone: z.string().min(10),
   amount: z.number().positive(),
   causeId: z.string().optional().nullable(),
-  message: z.string().min(5),
+  customCause: z.string().optional().nullable(),
+  message: z.string().optional().default(''),
   paymentId: z.string().min(3),
   status: z.enum(['pending', 'completed', 'failed']).optional(),
-  receipt: z.string().optional(),
+  receipt: z.string().optional().nullable(),
   userId: z.string().optional().nullable(),
-  aadharNumber: z.string().length(12, "Aadhar must be 12 digits").optional(),
-  panCardNumber: z.string().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN number").optional()
+  aadharNumber: z.string().optional().nullable(),
+  panCardNumber: z.string().optional().nullable()
 });
 
 
