@@ -15,8 +15,13 @@ exports.authenticate = async (req, res, next) => {
       });
     }
 
-    // Verify token
+    // check if not expired
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (decoded.exp < Date.now() / 1000) {
+      // delete token from cookies
+      res.clearCookie('token');
+      return res.status(401).json({ success: false, error: 'Token expired' });
+    }
 
     // Find user and attach to request
     const user = await User.findById(decoded.id).select('-password');
