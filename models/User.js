@@ -81,7 +81,12 @@ const userSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  // Job/Organization/Individual job features
+  jobPostsThisYear: { type: Number, default: 0 }, // For organizations
+  isPaidMember: { type: Boolean, default: false }, // For organizations
+  jobApplicationsThisYear: { type: Number, default: 0 }, // For individuals
+  isUpgraded: { type: Boolean, default: false }, // For individuals
 }, { timestamps: true });
 
 // Hash password before saving

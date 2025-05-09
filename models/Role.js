@@ -31,7 +31,8 @@ const roleSchema = new mongoose.Schema(
       causes: permissionsTypeSchema,
       crowdFunding: permissionsTypeSchema,
       forum: permissionsTypeSchema,
-      shop: permissionsTypeSchema
+      shop: permissionsTypeSchema,
+      donations: permissionsTypeSchema,
     },
   },
   { timestamps: true }
