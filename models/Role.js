@@ -33,6 +33,7 @@ const roleSchema = new mongoose.Schema(
       forum: permissionsTypeSchema,
       shop: permissionsTypeSchema,
       donations: permissionsTypeSchema,
+      contacts: permissionsTypeSchema,
     },
   },
   { timestamps: true }
