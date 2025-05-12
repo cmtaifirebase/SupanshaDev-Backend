@@ -19,7 +19,7 @@ router.use(authenticate);
 router.get("/", requireModulePermission("volunteers", "read"), getVolunteers);
 
 // Create new volunteer
-// router.post("/", requireModulePermission("volunteers", "create"), createVolunteer);
+router.post("/", requireModulePermission("volunteers", "create"), createVolunteer);
 
 // Update volunteer status
 router.patch("/:id/status", requireModulePermission("volunteers", "update"), updateVolunteerStatus);
