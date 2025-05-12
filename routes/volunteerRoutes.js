@@ -13,7 +13,7 @@ const { authenticate, requireModulePermission } = require("../middlewares/authMi
 const router = express.Router();
 
 // Protected routes
-router.use(authenticate);
+// router.use(authenticate);
 
 // Get all volunteers
 router.get("/", requireModulePermission("volunteers", "read"), getVolunteers);
