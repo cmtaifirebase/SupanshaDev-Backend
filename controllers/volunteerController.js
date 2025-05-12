@@ -1,9 +1,10 @@
 const Volunteer = require('../models/Volunteer');
-const { handleError } = require('../utils/errorHandler');
+// const { handleError } = require('../utils/errorHandler');
 
 // Get all volunteers
 exports.getVolunteers = async (req, res) => {
   try {
+    console.log("Fetching all volunteers"); 
     const volunteers = await Volunteer.find().sort({ createdAt: -1 });
     res.json({ success: true, data: volunteers });
   } catch (error) {
