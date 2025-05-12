@@ -10,6 +10,9 @@ const {
 } = require('../controllers/blogController');
 
 const { authenticate, requireModulePermission } = require('../middlewares/authMiddleware');
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 // Protected routes
 // Public routes
@@ -20,7 +23,7 @@ router.get('/', getAllPublishedBlogs);
 
 // Admin routes - must come before /:slug to avoid conflicts
 router.get('/admin', authenticate, requireModulePermission('blogs', 'read'), getAllBlogs);
-router.post('/', authenticate, requireModulePermission('blogs', 'create'), createBlog);
+router.post('/', authenticate, requireModulePermission('blogs', 'create'), upload.single('image'), createBlog);
 router.put('/:id', authenticate, requireModulePermission('blogs', 'update'), updateBlog);
 router.delete('/:id', authenticate, requireModulePermission('blogs', 'delete'), deleteBlog);
 

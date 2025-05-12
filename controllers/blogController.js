@@ -1,6 +1,7 @@
 const Blog = require('../models/Blog');
 const slugify = require('slugify');
 const { z } = require('zod');
+const { uploadFile } = require('../utils/upload');
 
 const createBlogSchema = z.object({
     title: z.string().min(3, "Title must be at least 3 characters"),
@@ -18,8 +19,25 @@ const createBlogSchema = z.object({
   
 const updateBlogSchema = createBlogSchema.partial();
 
+// Helper to handle file upload and return imageLink
+async function handleImageUpload(req, folder = 'blogs') {
+  if (req.file) {
+    // req.file.buffer and req.file.originalname are set by multer
+    return await uploadFile(req.file.buffer, req.file.originalname, folder);
+  }
+  return null;
+}
+
 exports.createBlog = async (req, res) => {
   try {
+    // Parse JSON fields if sent as strings (for multipart)
+    if (req.body.seoKeywords && typeof req.body.seoKeywords === 'string') {
+      req.body.seoKeywords = req.body.seoKeywords.split(',').map(s => s.trim()).filter(Boolean);
+    }
+    if (req.body.tags && typeof req.body.tags === 'string') {
+      req.body.tags = req.body.tags.split(',').map(s => s.trim()).filter(Boolean);
+    }
+
     const result = createBlogSchema.safeParse(req.body);
     if (!result.success) {
       return res.status(400).json({ success: false, message: "Validation failed", errors: result.error.errors });
@@ -35,11 +53,18 @@ exports.createBlog = async (req, res) => {
 
     const estimatedReadTime = `${Math.ceil(content.split(' ').length / 200)} min read`;
 
+    // Handle image upload
+    let imageLink = null;
+    if (req.file) {
+      imageLink = await handleImageUpload(req, 'blogs');
+    }
+
     const newBlog = new Blog({
       ...result.data,
       slug,
       authorId: req.user._id,
-      estimatedReadTime
+      estimatedReadTime,
+      imageLink
     });
 
     const saved = await newBlog.save();

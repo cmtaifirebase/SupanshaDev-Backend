@@ -57,6 +57,10 @@ const blogSchema = new mongoose.Schema({
     type: String,
     default: null
   },
+  imageLink: {
+    type: String,
+    default: null
+  },
   content: {
     type: String,
     required: true

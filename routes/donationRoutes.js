@@ -15,7 +15,7 @@ const { authenticate, requireModulePermission } = require('../middlewares/authMi
 const router = express.Router();
 
 // Public routes
-router.post('/', createDonation);
+router.post('/', authenticate, createDonation);
 
 // Protected routes
 router.use(authenticate);

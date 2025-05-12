@@ -1,12 +1,13 @@
 const {Donation} = require('../models/Donation');
 const { z } = require('zod');
+const Cause = require('../models/Cause');
 
 const donationSchema = z.object({
   name: z.string().min(3),
   email: z.string().email(),
   phone: z.string().min(10),
   amount: z.number().positive(),
-  causeId: z.string().optional().nullable(),
+  causeSlug: z.string().optional().nullable(),
   customCause: z.string().optional().nullable(),
   message: z.string().optional().default(''),
   paymentId: z.string().min(3),
@@ -26,6 +27,9 @@ exports.createDonation = async (req, res) => {
   }
 
   try {
+    // Always set userId
+    result.data.userId = req.user._id;
+    // Only store causeSlug and customCause, do not look up or store causeId
     const donation = await Donation.create(result.data);
     res.status(201).json({
       message: "Donation successful",
