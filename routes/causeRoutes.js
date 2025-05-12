@@ -27,5 +27,6 @@ router.get('/', requireModulePermission('causes', 'read'), getAllCauses);
 router.put('/:id', requireModulePermission('causes', 'update'), updateCause);
 router.delete('/:id', requireModulePermission('causes', 'delete'), deleteCause);
 router.patch('/:id/status', requireModulePermission('causes', 'update'), updateCauseStatus);
+// router.get('/getActive', requireModulePermission('causes', 'read'), getCausesByCategory);
 
 module.exports = router; 

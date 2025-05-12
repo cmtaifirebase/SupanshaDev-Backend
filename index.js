@@ -22,26 +22,26 @@ const causeRoutes = require('./routes/causeRoutes')
 const app = express();
 
 // Middleware
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      const allowed = [
-        process.env.CLIENT_URL,
-        "http://localhost:3000",
-        "http://localhost:5000",
-        "https://supanshadevelopment-kaxpaxhir-adarshs-projects-5a0ea829.vercel.app",
-      ].filter(Boolean);
+// app.use(
+//   cors({
+//     origin: (origin, callback) => {
+//       const allowed = [
+//         process.env.CLIENT_URL,
+//         "http://localhost:3000",
+//         "http://localhost:5000",
+//         "https://supanshadevelopment-kaxpaxhir-adarshs-projects-5a0ea829.vercel.app",
+//       ].filter(Boolean);
 
-      if (!origin || allowed.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
-);
-
+//       if (!origin || allowed.includes(origin)) {
+//         callback(null, true);
+//       } else {
+//         callback(new Error("Not allowed by CORS"));
+//       }
+//     },
+//     credentials: true,
+//   })
+// );
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
