@@ -16,7 +16,7 @@ const router = express.Router();
 // router.use(authenticate);
 
 // Get all volunteers
-router.get("/", requireModulePermission("volunteers", "read"), getVolunteers);
+router.get("/",authenticate, requireModulePermission("volunteers", "read"), getVolunteers);
 
 // Create new volunteer
 router.post("/", requireModulePermission("volunteers", "create"), createVolunteer);
