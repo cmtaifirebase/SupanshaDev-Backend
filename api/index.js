@@ -3,20 +3,20 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
-const connectDB = require('./db/db');
+const connectDB = require('../db/db');
 connectDB();
 
 // API Routes
-const authRoutes = require('./routes/authRoutes');
-const blogRoutes = require('./routes/blogRoutes');
-const eventRoutes = require('./routes/eventRoutes');
-const jobRoutes = require('./routes/jobRoutes');
-const contactRoutes = require('./routes/contactRoutes');
-const donationRoutes = require('./routes/donationRoutes');
-const activityRoutes = require('./routes/activityRoutes')
-const userRoutes = require('./routes/userRoutes')
-const roleRoutes = require('./routes/roleRoutes')
-const causeRoutes = require('./routes/causeRoutes')
+const authRoutes = require('../routes/authRoutes');
+const blogRoutes = require('../routes/blogRoutes');
+const eventRoutes = require('../routes/eventRoutes');
+const jobRoutes = require('../routes/jobRoutes');
+const contactRoutes = require('../routes/contactRoutes');
+const donationRoutes = require('../routes/donationRoutes');
+const activityRoutes = require('../routes/activityRoutes')
+const userRoutes = require('../routes/userRoutes')
+const roleRoutes = require('../routes/roleRoutes')
+const causeRoutes = require('../routes/causeRoutes')
 
 // Initialize Express app
 const app = express();
