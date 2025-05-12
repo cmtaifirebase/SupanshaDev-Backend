@@ -39,7 +39,7 @@ const allowedOrigins = [
 //   credentials: true,
 // }));
 app.use(cors({
-  origin: ["http://localhost:3000", "https://supanshadevelopment2.vercel.app/","http://localhost:5173"],
+  origin: ["http://localhost:3000", "https://supanshadevelopment2.vercel.app","http://localhost:5173"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
