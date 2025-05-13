@@ -1,5 +1,5 @@
 const Volunteer = require('../models/Volunteer');
-const { handleError } = require('../utils/errorHandler');
+// const { handleError } = require('../utils/errorHandler');
 
 // Get all volunteers
 exports.getVolunteers = async (req, res) => {
